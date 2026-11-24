@@ -23,6 +23,22 @@ Most security stacks are three strangers: offense scales badly, defense drowns i
 So the attacker never plays the same board twice. Every round is a move. **That's the game.**
  
 ---
+
+
+# Project Description
+
+**Background.** Enterprise security today is split across three disciplines that rarely operate as one system. Offensive testing is deep but manual and hard to scale against fast-changing web, API, and AI-integrated applications, while signature-based scanners generate high false-positive rates and miss logic flaws. Defensive operations drown analysts in alerts, and AI-driven detections are often opaque — a confidence score with no evidence behind it. Governance, risk, and compliance (GRC) remains largely a static, spreadsheet-driven exercise, disconnected from the live telemetry that should be driving risk decisions. The result is three silos that cannot react to one another in time.
+
+**Motivation (integrated track).** Our team, *Pandemonium*, pursues the integrated Red–Blue–GRC track: we build all three systems and connect them into one platform where they exchange machine-readable information and respond to each other in a continuous, closed loop. The exercise behaves like a game of chess — the Red agent makes a move, the Blue pipeline detects and contains it, and the GRC engine recalculates risk and issues a treatment decision that is applied back as a concrete defensive configuration change, so the "board" the attacker faces is different in the next round. Every event is correlated through a shared `exercise_run_id`, and every record carries its provenance (AI-inferred, verified, or human-approved).
+
+**Specific aims.**
+
+1. An AI Red Team agent that plans, executes, and programmatically verifies multi-step attack chains against isolated lab targets restricted by a hard-coded allowlist, exporting findings as JSON/SARIF 2.1.0.
+2. A vendor-agnostic Blue Team pipeline (SIEM/SOAR) with explainable detection, confusion-matrix evaluation, and multi-vendor automated containment with human-in-the-loop guardrails.
+3. A standard-neutral GRC platform providing cross-framework mapping, pluggable ISRM scoring, a budget-constrained treatment optimizer, and BIA validation (RTO + WRT ≤ MTD, with RPO as a separate bound).
+4. An integration layer — shared contracts, `exercise_run_id` correlation, and a closed-loop controller — that turns GRC decisions into defensive changes and preserves end-to-end traceability under adversarial and failure conditions.
+
+-----
  
 ## ♟️ The loop
  
