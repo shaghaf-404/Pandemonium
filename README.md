@@ -114,7 +114,7 @@ This is an isolated war-game, and it stays that way:
 |--------|------|
 | **Shaghaf** | Red Team lead (CNC 418) |
 | **Karim** | Blue Team lead (CNC 411) |
-| **Safi** | GRC lead (CNC 419) |
+| **Alsafy** | GRC lead (CNC 419) |
  
 All three own the integration layer together, and any member can defend any part of the codebase.
  
