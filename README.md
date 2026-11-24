@@ -1,5 +1,5 @@
 <div align="center">
-# ♟️ Pandemonium
+♟️ Pandemonium
  
 ### A living cyber-range where attack, defense, and governance play one long game of chess.
  
@@ -12,7 +12,7 @@
 ![status](https://img.shields.io/badge/status-in%20development-BA7517)
  
 </div>
----
+
  
 ## The idea
  
