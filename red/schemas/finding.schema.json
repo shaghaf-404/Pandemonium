@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pandemonium.lab/schemas/finding.schema.json",
+  "title": "Pandemonium Red Finding",
+  "description": "The verified-finding contract Red shares with Blue and GRC (CNC 418).",
+  "type": "object",
+  "required": ["finding_id", "exercise_run_id", "target_asset", "title", "exploit_status"],
+  "properties": {
+    "finding_id": { "type": "string" },
+    "exercise_run_id": { "type": "string" },
+    "target_asset": { "type": "string" },
+    "title": { "type": "string" },
+    "cwe_id": { "type": ["string", "null"] },
+    "stride_category": { "type": ["string", "null"] },
+    "mitre_technique_id": { "type": ["string", "null"] },
+    "cvss_vector": { "type": ["string", "null"] },
+    "exploit_status": {
+      "type": "string",
+      "enum": ["unverified", "verified", "failed", "rejected"]
+    },
+    "verified_poc": { "type": "string" },
+    "created_at": { "type": "string" },
+    "chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["order", "target", "technique"],
+        "properties": {
+          "order": { "type": "integer" },
+          "target": { "type": "string" },
+          "technique": { "type": "string" },
+          "description": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    }
+  }
+}
