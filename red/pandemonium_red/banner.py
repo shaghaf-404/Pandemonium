@@ -1,3 +1,4 @@
+cat > pandemonium_red/banner.py << 'PANDEMO_EOF'
 """The Pandemonium console banner (ASCII art, shown on launch)."""
 from __future__ import annotations
 
@@ -5,32 +6,41 @@ import os
 import re
 import sys
 
-# ANSI colors (256-color). Stripped automatically when output isn't a terminal.
 _RESET = "\033[0m"
 _BOLD = "\033[1m"
-_FOG = "\033[38;5;250m"    # pale grey mist
-_SMOKE = "\033[38;5;243m"  # darker grey
-_EYE = "\033[38;5;196m"    # glowing red
-_ACCENT = "\033[38;5;160m"  # blood red
-_MUTE = "\033[38;5;240m"
+_FOG = "38;5;250"     # pale mist
+_SMOKE = "38;5;243"   # grey
+_MUTE = "38;5;240"    # dim grey
+_EYE = "38;5;196"     # glowing red
+# Flame gradient for the wordmark, bright at the top, embers at the bottom.
+_FLAME = ["38;5;196", "38;5;196", "38;5;160", "38;5;160", "38;5;124"]
 
 _ANSI_RE = re.compile(r"\033\[[0-9;]*m")
+_LEFT = "   "
 
 # The horned one, rising from the fog.
 _EMBLEM = [
-    "         ╲╲╲                             ╱╱╱",
-    "          ╲╲╲╲                         ╱╱╱╱",
-    "           ╲╲╲╲╲                     ╱╱╱╱╱",
-    "            ╲╲╲╲▗▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▖╱╱╱╱",
-    "                ▐                 ▌",
-    "                ▐   ◉         ◉   ▌",
-    "                ▐       ╲╳╱       ▌",
-    "                ▝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▘",
+    "            ╲╲╲▖                               ▗╱╱╱",
+    "              ╲╲╲╲▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄╱╱╱╱",
+    "               ▐██▘   ◉               ◉   ▝██▌",
+    "                ▝██▄▄        ╲▼╱        ▄▄██▘",
+    "                   ▀▀██▄▄▄▄▄▄▄▄▄▄▄▄▄██▀▀",
 ]
 
-_NAME = "P A N D E M O N I U M"
-_BORDER_TOP = "   ┌" + "─" * 47 + "┐"
-_BORDER_BOT = "   └" + "─" * 47 + "┘"
+# "PANDEMONIUM" in block letters (65 wide).
+_WORDMARK = [
+    "█████  ███  █   █ ████  █████ █   █  ███  █   █ █████ █   █ █   █",
+    "█   █ █   █ ██  █ █   █ █     ██ ██ █   █ ██  █   █   █   █ ██ ██",
+    "█████ █████ █ █ █ █   █ ███   █ █ █ █   █ █ █ █   █   █   █ █ █ █",
+    "█     █   █ █  ██ █   █ █     █   █ █   █ █  ██   █   █   █ █   █",
+    "█     █   █ █   █ ████  █████ █   █  ███  █   █ █████  ███  █   █",
+]
+
+_INNER = 62  # info-box inner width
+
+
+def _c(text: str, code: str, on: bool) -> str:
+    return f"\033[{code}m{text}{_RESET}" if on else text
 
 
 def _strip(text: str) -> str:
@@ -44,34 +54,43 @@ def supports_color(stream=None) -> bool:
     return hasattr(stream, "isatty") and stream.isatty()
 
 
+def _box(lines: list[str], on: bool) -> list[str]:
+    top = _LEFT + _c("╔" + "═" * _INNER + "╗", _SMOKE, on)
+    bot = _LEFT + _c("╚" + "═" * _INNER + "╝", _SMOKE, on)
+    out = [top]
+    for text, code in lines:
+        body = f"  {text}".ljust(_INNER)
+        out.append(_LEFT + _c("║", _SMOKE, on) + _c(body, code, on) + _c("║", _SMOKE, on))
+    out.append(bot)
+    return out
+
+
 def render(version: str = "0.1.0", allowlist: str | None = None, color: bool | None = None) -> str:
-    if color is None:
-        color = supports_color()
+    on = supports_color() if color is None else color
 
     lines: list[str] = [""]
     for row in _EMBLEM:
-        row = row.replace("◉", f"{_EYE}◉{_FOG}")
-        lines.append(f"{_FOG}{row}{_RESET}")
+        if on:
+            row = row.replace("◉", f"\033[{_EYE}m◉\033[{_FOG}m")
+            lines.append(f"{_LEFT}\033[{_FOG}m{row}{_RESET}")
+        else:
+            lines.append(_LEFT + row)
     lines.append("")
-
-    # Wordmark box (inner width 47).
-    pad = 47 - len(_NAME) - 8
-    lines.append(f"{_SMOKE}{_BORDER_TOP}{_RESET}")
-    lines.append(
-        f"{_SMOKE}   │        {_BOLD}{_ACCENT}{_NAME}{_RESET}{_SMOKE}{' ' * pad}│{_RESET}"
-    )
-    lines.append(f"{_SMOKE}{_BORDER_BOT}{_RESET}")
+    for row, code in zip(_WORDMARK, _FLAME):
+        lines.append(_LEFT + _c(row, code, on))
     lines.append("")
-
-    lines.append(f"   {_FOG}red · CNC 418{_RESET}   {_MUTE}·{_RESET}   {_FOG}v{version}{_RESET}")
-    lines.append(f"   {_MUTE}lab-only · allowlist-enforced · verify-before-report{_RESET}")
+    panel = [
+        (f"the red agent  ·  CNC 418  ·  v{version}", _FOG),
+        ("lab-only · allowlist-enforced · verify-before-report", _MUTE),
+    ]
     if allowlist:
-        lines.append(f"   {_MUTE}allowlist: {allowlist}{_RESET}")
+        panel.append((f"allowlist: {allowlist}", _MUTE))
+    lines += _box(panel, on)
     lines.append("")
 
-    out = "\n".join(lines)
-    return out if color else _strip(out)
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":
     print(render(color=True))
+PANDEMO_EOF
