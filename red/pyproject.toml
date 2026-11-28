@@ -15,7 +15,7 @@ schema = ["jsonschema>=4.0"]
 dev = ["pytest>=7.0", "pyyaml>=6.0", "jsonschema>=4.0"]
 
 [project.scripts]
-pandemonium-red = "pandemonium_red.cli:main"
+pandemo = "pandemonium_red.cli:main"
 
 [tool.setuptools]
 packages = ["pandemonium_red"]
