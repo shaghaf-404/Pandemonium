@@ -1,0 +1,30 @@
+# Pandemonium Red — target allowlist (DEFAULT-DENY).
+#
+# The Red agent may only touch what is listed here. Anything else is refused
+# in code before a single packet is sent. Copy this to `allowlist.yaml` and
+# adjust the subnets to match your EVE-NG lab.
+#
+# On the list = the lab "company" Red is allowed to attack.
+# Off the list (on purpose): the real internet, the SOC, the management
+# network, and the out-of-band control plane.
+
+networks:
+  - 127.0.0.1/32        # localhost (local test targets)
+  - 172.16.10.0/24      # DMZ  — WEB-01, AI-01
+  - 10.10.20.0/24       # Users VLAN — WS-01, WS-02
+  - 10.10.30.0/24       # Servers VLAN — DC-01, APP-01
+  - 203.0.113.0/24      # simulated-internet edge (WAN side of FW-EDGE)
+
+hostnames:
+  - web-01.lab
+  - app-01.lab
+
+# Resolve hostnames and check their IPs too (stops a lab name from pointing
+# somewhere outside the lab). Set to false to match names literally only.
+resolve: true
+
+# NOT listed, and must stay that way:
+#   192.168.100.0/24  control plane (GRC, orchestrator)
+#   10.10.40.0/24     SOC (SIEM, IDS, SOAR)
+#   10.10.99.0/24     management
+#   the EVE-NG host and anything on the real internet
